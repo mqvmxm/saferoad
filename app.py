@@ -2,16 +2,14 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# Definimos las rutas de tu plataforma
+# Esta función ayudará a que no falle si falta una variable en el HTML
+@app.context_processor
+def inject_defaults():
+    return dict(total_e=0, total_enc=0, nombre_usuario='Invitado')
+
 @app.route('/')
 def index():
-    # Estas son las variables que mencionaste anteriormente. 
-    # Si tu index.html pide alguna otra, simplemente agrégala aquí como: 'nombre': valor
-    datos = {
-        'total_e': 0,
-        'total_enc': 0
-    }
-    return render_template('index.html', **datos)
+    return render_template('index.html')
 
 @app.route('/entrevista')
 def entrevista():
@@ -24,10 +22,3 @@ def encuesta():
 @app.route('/resultados')
 def resultados():
     return render_template('resultados.html')
-
-@app.route('/exportar')
-def exportar():
-    return "Exportar en construcción"
-
-# NOTA: No incluyas 'if __name__ == "__main__":' 
-# porque Vercel lo gestiona automáticamente.
