@@ -1,22 +1,33 @@
 from flask import Flask, render_template
 
-app = Flask(__name__)  # Vercel busca específicamente esta variable 'app'
+app = Flask(__name__)
 
+# Definimos las rutas de tu plataforma
 @app.route('/')
 def index():
-    # Aquí definimos un "diccionario" de seguridad con todas las variables que tu HTML pudiera estar pidiendo
-    # Ponles 0 a todas para que la página cargue sí o sí.
-    variables = {
+    # Estas son las variables que mencionaste anteriormente. 
+    # Si tu index.html pide alguna otra, simplemente agrégala aquí como: 'nombre': valor
+    datos = {
         'total_e': 0,
-        'total_enc': 0,
-        'otra_variable': 0,
-        'nombre_usuario': 'Invitado'
+        'total_enc': 0
     }
-    return render_template('index.html', **variables)
+    return render_template('index.html', **datos)
 
-# ... (tus otras rutas aquí)
+@app.route('/entrevista')
+def entrevista():
+    return render_template('entrevista.html')
 
-# QUITA O COMENTA la parte de 'if __name__ == "__main__":'
-# A Vercel no le gusta eso cuando despliegas, le estorba.
-# if __name__ == '__main__':
-#     app.run()
+@app.route('/encuesta')
+def encuesta():
+    return render_template('encuesta.html')
+
+@app.route('/resultados')
+def resultados():
+    return render_template('resultados.html')
+
+@app.route('/exportar')
+def exportar():
+    return "Exportar en construcción"
+
+# NOTA: No incluyas 'if __name__ == "__main__":' 
+# porque Vercel lo gestiona automáticamente.
