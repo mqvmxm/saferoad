@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Resultados{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>📊 Resultados</h1>
+  <p class="subtitle">Dashboard en tiempo real · Actualiza al guardar nuevas respuestas</p>
+</div>
+
+<!-- ESTADÍSTICAS -->
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-number">{{ entrevistas|length }}</div><div class="stat-label">Entrevistas</div></div>
+  <div class="stat-card"><div class="stat-number">{{ encuestas|length }}</div><div class="stat-label">Encuestas</div></div>
+  <div class="stat-card"><div class="stat-number">{{ entrevistas|length + encuestas|length }}</div><div class="stat-label">Total registros</div></div>
+  <div class="stat-card">
+    <div class="stat-number">
+      {% if promedios_lk %}{{ (promedios_lk | sum / promedios_lk | length) | round(1) }}{% else %}—{% endif %}
+    </div>
+    <div class="stat-label">Promedio Likert</div>
+  </div>
+</div>
+
+<!-- PERFILES -->
+{% if perfiles %}
+<div class="result-card">
+  <h2 class="section-title">Registros por perfil</h2>
+  <div class="perfil-tags">
+    {% for p, n in perfiles.items() %}
+    <span class="tag tag-{{ p }}">{{ p|capitalize }}: {{ n }}</span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- PROBLEMA PRINCIPAL -->
+{% if problemas %}
+<div class="result-card">
+  <h2 class="section-title">Problema más urgente (encuestas)</h2>
+  {% set max_n = problemas[0][1] %}
+  {% for prob, n in problemas %}
+  <div class="bar-row">
+    <div class="bar-label">{{ prob }}</div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:{{ (n / max_n * 100)|int }}%"></div></div>
+    <div class="bar-n">{{ n }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- LIKERT -->
+{% if promedios_lk %}
+<div class="result-card">
+  <h2 class="section-title">Escala Likert — Promedios</h2>
+  <p class="likert-hint">Escala del 1 al 5</p>
+  {% for i in range(labels_lk|length) %}
+  <div class="bar-row">
+    <div class="bar-label">{{ labels_lk[i] }}</div>
+    <div class="bar-wrap"><div class="bar-fill bar-green" style="width:{{ (promedios_lk[i] / 5 * 100)|int }}%"></div></div>
+    <div class="bar-n">{{ promedios_lk[i] }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ENTREVISTAS -->
+<div class="result-card">
+  <h2 class="section-title">Entrevistas guardadas ({{ entrevistas|length }})</h2>
+  {% if entrevistas %}
+    {% for e in entrevistas %}
+    <div class="record">
+      <div class="record-head">
+        <div>
+          <span class="tag tag-{{ e.perfil }}">{{ e.perfil|capitalize }}</span>
+          <strong class="record-name">{{ e.nombre }}</strong>
+          <span class="record-date">{{ e.fecha.strftime('%d/%m/%Y %H:%M') }}</span>
+        </div>
+        <form method="POST" action="{{ url_for('main.eliminar_entrevista', id=e.id) }}" onsubmit="return confirm('¿Eliminar esta entrevista?')">
+          <button type="submit" class="btn-delete">✕</button>
+        </form>
+      </div>
+      <div class="record-body">
+        {% for attr in ['p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12'] %}
+          {% if getattr(e, attr) %}
+          <div class="record-item"><strong>R{{ loop.index }}:</strong> {{ getattr(e, attr) }}</div>
+          {% endif %}
+        {% endfor %}
+        {% if e.notas %}<div class="record-item record-notes"><strong>Notas:</strong> {{ e.notas }}</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="empty-text">No hay entrevistas guardadas aún.</p>
+  {% endif %}
+</div>
+
+<!-- ENCUESTAS -->
+<div class="result-card">
+  <h2 class="section-title">Encuestas guardadas ({{ encuestas|length }})</h2>
+  {% if encuestas %}
+    {% for e in encuestas %}
+    <div class="record">
+      <div class="record-head">
+        <div>
+          <span class="tag tag-{{ e.perfil }}">{{ e.perfil|capitalize }}</span>
+          <strong class="record-name">{{ e.nombre }}</strong>
+          <span class="record-date">{{ e.fecha.strftime('%d/%m/%Y %H:%M') }}</span>
+        </div>
+        <form method="POST" action="{{ url_for('main.eliminar_encuesta', id=e.id) }}" onsubmit="return confirm('¿Eliminar esta encuesta?')">
+          <button type="submit" class="btn-delete">✕</button>
+        </form>
+      </div>
+      <div class="record-body">
+        {% if e.problema_principal %}<div class="record-item"><strong>Problema principal:</strong> {{ e.problema_principal }}</div>{% endif %}
+        {% if e.lk_fatiga_riesgo %}<div class="record-item"><strong>Likert fatiga:</strong> {{ e.lk_fatiga_riesgo }}/5 · SafeRoad: {{ e.lk_usaria_saferoad }}/5 · Precio: {{ e.lk_precio_razonable }}/5</div>{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p class="empty-text">No hay encuestas guardadas aún.</p>
+  {% endif %}
+</div>
+
+<a href="{{ url_for('main.exportar') }}" class="btn btn-primary" style="display:inline-block;margin-top:8px">Exportar todo a CSV</a>
+{% endblock %}

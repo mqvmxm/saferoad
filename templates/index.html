@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>SafeRoad <span class="badge-sub">Investigación de mercado</span></h1>
+  <p class="subtitle">UTEC Tulancingo · TI 32 · Mayo–Agosto 2026</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-number">{{ total_e }}</div>
+    <div class="stat-label">Entrevistas registradas</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ total_enc }}</div>
+    <div class="stat-label">Encuestas registradas</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number">{{ total_e + total_enc }}</div>
+    <div class="stat-label">Registros totales</div>
+  </div>
+</div>
+
+<div class="card-grid">
+  <a href="{{ url_for('main.entrevista') }}" class="action-card">
+    <div class="action-icon">🎙️</div>
+    <div class="action-title">Nueva Entrevista</div>
+    <div class="action-sub">1–2 personas por perfil · Preguntas abiertas</div>
+  </a>
+  <a href="{{ url_for('main.encuesta') }}" class="action-card">
+    <div class="action-icon">📋</div>
+    <div class="action-title">Nueva Encuesta</div>
+    <div class="action-sub">10–20 personas · Cerrado + Likert</div>
+  </a>
+  <a href="{{ url_for('main.resultados') }}" class="action-card">
+    <div class="action-icon">📊</div>
+    <div class="action-title">Ver Resultados</div>
+    <div class="action-sub">Dashboard y registros guardados</div>
+  </a>
+</div>
+
+<div class="info-box">
+  <strong>Perfiles que aplican:</strong>
+  <div class="perfil-tags">
+    <span class="tag tag-conductor">Conductor de carga</span>
+    <span class="tag tag-empresa">Dueño de empresa</span>
+    <span class="tag tag-mecanico">Mecánico / Taller</span>
+    <span class="tag tag-civil">Civil</span>
+  </div>
+  <p class="info-note">Los civiles solo aplican encuesta. Los demás perfiles aplican entrevista y encuesta.</p>
+</div>
+{% endblock %}

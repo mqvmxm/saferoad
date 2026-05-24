@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Entrevista{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>🎙️ Entrevista</h1>
+  <p class="subtitle">Presencial · 15–20 min · 1–2 personas por perfil</p>
+</div>
+
+<div class="note-box">
+  <strong>Nota:</strong> Los civiles no aplican entrevista. Selecciona el perfil para cargar las preguntas correspondientes.
+</div>
+
+<form method="POST" action="{{ url_for('main.entrevista') }}" id="form-entrevista">
+  <div class="form-card">
+    <h2 class="section-title">Datos del entrevistado</h2>
+    <div class="field-group">
+      <div class="field">
+        <label class="field-label">Nombre completo <span class="req">*</span></label>
+        <input type="text" name="nombre" id="nombre" placeholder="Nombre de la persona" required class="input">
+      </div>
+      <div class="field">
+        <label class="field-label">Perfil <span class="req">*</span></label>
+        <select name="perfil" id="perfil" required class="input" onchange="cargarPreguntas()">
+          <option value="">— Selecciona perfil —</option>
+          <option value="conductor">Conductor de carga</option>
+          <option value="empresa">Dueño de empresa de transporte</option>
+          <option value="mecanico">Mecánico / Empleado de taller</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div id="preguntas-container" class="form-card hidden">
+    <h2 class="section-title" id="preguntas-titulo">Preguntas</h2>
+    <div id="preguntas-lista"></div>
+    <div class="field" style="margin-top:16px">
+      <label class="field-label">Notas del entrevistador</label>
+      <textarea name="notas" class="input textarea" placeholder="Observaciones, lenguaje corporal, actitud durante la entrevista..."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar entrevista</button>
+  </div>
+</form>
+
+<script>
+const preguntas = {{ preguntas_json | tojson }};
+
+function cargarPreguntas() {
+  const perfil = document.getElementById('perfil').value;
+  const container = document.getElementById('preguntas-container');
+  const lista = document.getElementById('preguntas-lista');
+  const titulo = document.getElementById('preguntas-titulo');
+
+  if (!perfil || !preguntas[perfil]) {
+    container.classList.add('hidden');
+    return;
+  }
+
+  const nombres = { conductor: 'Conductor de carga', empresa: 'Dueño de empresa', mecanico: 'Mecánico / Taller' };
+  titulo.textContent = 'Preguntas — ' + nombres[perfil];
+
+  lista.innerHTML = '';
+  preguntas[perfil].forEach(([campo, texto], i) => {
+    if (campo === 'notas') return;
+    const div = document.createElement('div');
+    div.className = 'field';
+    div.innerHTML = `
+      <label class="field-label">${i + 1}. ${texto}</label>
+      <textarea name="${campo}" class="input textarea" placeholder="Respuesta..."></textarea>
+    `;
+    lista.appendChild(div);
+  });
+
+  container.classList.remove('hidden');
+}
+</script>
+{% endblock %}

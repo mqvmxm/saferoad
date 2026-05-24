@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% block title %}Encuesta{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>📋 Encuesta / Cuestionario</h1>
+  <p class="subtitle">10–20 personas · Preguntas cerradas + Escala Likert</p>
+</div>
+
+<form method="POST" action="{{ url_for('main.encuesta') }}" id="form-encuesta">
+  <div class="form-card">
+    <h2 class="section-title">Datos</h2>
+    <div class="field-group">
+      <div class="field">
+        <label class="field-label">Nombre completo <span class="req">*</span></label>
+        <input type="text" name="nombre" placeholder="Nombre de la persona" required class="input">
+      </div>
+      <div class="field">
+        <label class="field-label">Perfil <span class="req">*</span></label>
+        <select name="perfil" id="perfil-enc" required class="input" onchange="mostrarSeccion()">
+          <option value="">— Selecciona perfil —</option>
+          <option value="conductor">Conductor de carga</option>
+          <option value="empresa">Dueño de empresa</option>
+          <option value="mecanico">Mecánico / Taller</option>
+          <option value="civil">Civil</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONDUCTOR -->
+  <div id="sec-conductor" class="form-card hidden">
+    <h2 class="section-title">Perfil del conductor</h2>
+    <div class="field">
+      <label class="field-label">Años de experiencia</label>
+      <div class="opts">
+        {% for op in opciones.conductor.anios_exp %}
+        <label class="opt-label"><input type="radio" name="anios_exp" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Horas promedio por jornada</label>
+      <div class="opts">
+        {% for op in opciones.conductor.horas_jornada %}
+        <label class="opt-label"><input type="radio" name="horas_jornada" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Horario principal</label>
+      <div class="opts opts-row">
+        {% for op in opciones.conductor.horario %}
+        <label class="opt-label"><input type="radio" name="horario" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Frecuencia de somnolencia mientras maneja</label>
+      <div class="opts">
+        {% for op in opciones.conductor.frecuencia_sueno %}
+        <label class="opt-label"><input type="radio" name="frecuencia_sueno" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Métodos para mantenerse despierto (puede marcar varios)</label>
+      <div class="opts">
+        {% for op in opciones.conductor.metodos_despierto %}
+        <label class="opt-label"><input type="checkbox" name="metodos_despierto" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Ha tenido un incidente por fatiga en los últimos 6 meses?</label>
+      <div class="opts opts-row">
+        {% for op in opciones.conductor.incidente_fatiga %}
+        <label class="opt-label"><input type="radio" name="incidente_fatiga" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cuál es el problema que más le afecta en su trabajo?</label>
+      <div class="opts">
+        {% for op in opciones.conductor.problema_principal %}
+        <label class="opt-label"><input type="radio" name="problema_principal" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cuenta con rastreo o seguridad en su vehículo?</label>
+      <div class="opts">
+        {% for op in opciones.conductor.tiene_rastreo %}
+        <label class="opt-label"><input type="radio" name="tiene_rastreo" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cómo lleva el control de mantenimiento de su vehículo?</label>
+      <div class="opts">
+        {% for op in opciones.conductor.control_mant %}
+        <label class="opt-label"><input type="radio" name="control_mant" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPRESA -->
+  <div id="sec-empresa" class="form-card hidden">
+    <h2 class="section-title">Datos de la empresa</h2>
+    <div class="field">
+      <label class="field-label">Número de unidades que opera</label>
+      <div class="opts">
+        {% for op in opciones.empresa.num_unidades %}
+        <label class="opt-label"><input type="radio" name="num_unidades" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Tiene sistema de monitoreo de conductores?</label>
+      <div class="opts">
+        {% for op in opciones.empresa.sistema_monitoreo %}
+        <label class="opt-label"><input type="radio" name="sistema_monitoreo" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Ha tenido accidentes relacionados con fatiga en su empresa?</label>
+      <div class="opts">
+        {% for op in opciones.empresa.accidente_empresa %}
+        <label class="opt-label"><input type="radio" name="accidente_empresa" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Costo aproximado del último incidente por fatiga</label>
+      <div class="opts">
+        {% for op in opciones.empresa.costo_incidente %}
+        <label class="opt-label"><input type="radio" name="costo_incidente" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Ha sufrido robo de vehículo o carga?</label>
+      <div class="opts">
+        {% for op in opciones.empresa.robo_vehiculo %}
+        <label class="opt-label"><input type="radio" name="robo_vehiculo" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cuál es el problema operativo que más le afecta económicamente?</label>
+      <div class="opts">
+        {% for op in opciones.empresa.problema_principal %}
+        <label class="opt-label"><input type="radio" name="problema_principal" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cómo lleva el control de mantenimiento de su flotilla?</label>
+      <div class="opts">
+        {% for op in opciones.empresa.control_flota %}
+        <label class="opt-label"><input type="radio" name="control_flota" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <input type="hidden" name="control_mant" value="Ver control_flota">
+  </div>
+
+  <!-- MECÁNICO -->
+  <div id="sec-mecanico" class="form-card hidden">
+    <h2 class="section-title">Perfil del mecánico</h2>
+    <div class="field">
+      <label class="field-label">Años de experiencia en mecánica de carga</label>
+      <div class="opts">
+        {% for op in opciones.mecanico.anios_mecanica %}
+        <label class="opt-label"><input type="radio" name="anios_mecanica" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cuál es la causa más frecuente de fallas graves en los vehículos que atiende?</label>
+      <div class="opts">
+        {% for op in opciones.mecanico.causa_fallas %}
+        <label class="opt-label"><input type="radio" name="causa_fallas" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Con qué frecuencia llegan vehículos sin ningún historial de mantenimiento?</label>
+      <div class="opts">
+        {% for op in opciones.mecanico.llegan_sin_historial %}
+        <label class="opt-label"><input type="radio" name="llegan_sin_historial" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Usaría una plataforma para registrar el historial de cada vehículo?</label>
+      <div class="opts">
+        {% for op in opciones.mecanico.usaria_plataforma %}
+        <label class="opt-label"><input type="radio" name="usaria_plataforma" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cuál es el problema que más le afecta en el taller?</label>
+      <div class="opts">
+        {% for op in opciones.mecanico.problema_principal %}
+        <label class="opt-label"><input type="radio" name="problema_principal" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <input type="hidden" name="control_mant" value="Ver causa_fallas">
+  </div>
+
+  <!-- CIVIL -->
+  <div id="sec-civil" class="form-card hidden">
+    <h2 class="section-title">Perfil del ciudadano</h2>
+    <div class="field">
+      <label class="field-label">¿Viaja frecuentemente por carretera federal?</label>
+      <div class="opts">
+        {% for op in opciones.civil.viaja_carretera %}
+        <label class="opt-label"><input type="radio" name="viaja_carretera" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Ha presenciado o conoce un accidente con vehículo de carga?</label>
+      <div class="opts">
+        {% for op in opciones.civil.vio_accidente %}
+        <label class="opt-label"><input type="radio" name="vio_accidente" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cuál considera el mayor riesgo que representan los camiones en carretera?</label>
+      <div class="opts">
+        {% for op in opciones.civil.riesgo_camiones %}
+        <label class="opt-label"><input type="radio" name="riesgo_camiones" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Sabía que la fatiga es una de las principales causas de accidentes con camiones?</label>
+      <div class="opts opts-row">
+        {% for op in opciones.civil.sabia_fatiga %}
+        <label class="opt-label"><input type="radio" name="sabia_fatiga" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">¿Cuál considera el mayor problema del sector transporte de carga?</label>
+      <div class="opts">
+        {% for op in opciones.civil.problema_principal %}
+        <label class="opt-label"><input type="radio" name="problema_principal" value="{{ op }}"> {{ op }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <input type="hidden" name="control_mant" value="No aplica">
+    <input type="hidden" name="tiene_tecnologia" value="No aplica">
+  </div>
+
+  <!-- LIKERT COMUNES -->
+  <div id="sec-likert" class="form-card hidden">
+    <h2 class="section-title">Escala de percepción</h2>
+    <p class="likert-hint">1 = Totalmente en desacuerdo &nbsp;·&nbsp; 5 = Totalmente de acuerdo</p>
+    {% for campo, texto in likert_comunes %}
+    <div class="field">
+      <label class="field-label">{{ texto }}</label>
+      <div class="likert-row">
+        {% for v in [1,2,3,4,5] %}
+        <label class="likert-opt">
+          <input type="radio" name="{{ campo }}" value="{{ v }}">
+          <span class="likert-num">{{ v }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+    <!-- Likert mecánico -->
+    <div id="likert-mecanico" class="hidden">
+      {% for campo, texto in likert_mecanico %}
+      <div class="field">
+        <label class="field-label">{{ texto }}</label>
+        <div class="likert-row">
+          {% for v in [1,2,3,4,5] %}
+          <label class="likert-opt">
+            <input type="radio" name="{{ campo }}" value="{{ v }}">
+            <span class="likert-num">{{ v }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Likert civil -->
+    <div id="likert-civil" class="hidden">
+      {% for campo, texto in likert_civil %}
+      <div class="field">
+        <label class="field-label">{{ texto }}</label>
+        <div class="likert-row">
+          {% for v in [1,2,3,4,5] %}
+          <label class="likert-opt">
+            <input type="radio" name="{{ campo }}" value="{{ v }}">
+            <span class="likert-num">{{ v }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="margin-top:16px">Guardar encuesta</button>
+  </div>
+</form>
+
+<script>
+function mostrarSeccion() {
+  const perfil = document.getElementById('perfil-enc').value;
+  const secs = ['conductor','empresa','mecanico','civil'];
+  secs.forEach(s => document.getElementById('sec-' + s).classList.add('hidden'));
+  document.getElementById('sec-likert').classList.add('hidden');
+  document.getElementById('likert-mecanico').classList.add('hidden');
+  document.getElementById('likert-civil').classList.add('hidden');
+
+  if (perfil) {
+    document.getElementById('sec-' + perfil).classList.remove('hidden');
+    document.getElementById('sec-likert').classList.remove('hidden');
+    if (perfil === 'mecanico') document.getElementById('likert-mecanico').classList.remove('hidden');
+    if (perfil === 'civil')    document.getElementById('likert-civil').classList.remove('hidden');
+  }
+}
+</script>
+{% endblock %}
