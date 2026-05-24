@@ -1,22 +1,14 @@
-from flask import Flask
-from models import db
+from flask import Flask, render_template
 
-def create_app():
-    app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///saferoad.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = 'saferoad-2026'
+app = Flask(__name__)  # Vercel busca específicamente esta variable 'app'
 
-    db.init_app(app)
+@app.route('/')
+def index():
+    return render_template('index.html', total_e=0, total_enc=0)
 
-    from routes import bp
-    app.register_blueprint(bp)
+# ... (tus otras rutas aquí)
 
-    with app.app_context():
-        db.create_all()
-
-    return app
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+# QUITA O COMENTA la parte de 'if __name__ == "__main__":'
+# A Vercel no le gusta eso cuando despliegas, le estorba.
+# if __name__ == '__main__':
+#     app.run()
