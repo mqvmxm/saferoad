@@ -4,12 +4,15 @@ app = Flask(__name__)  # Vercel busca específicamente esta variable 'app'
 
 @app.route('/')
 def index():
-    # Si tu HTML dice {{ variable }}, aquí tienes que definirla:
-    return render_template('index.html', 
-        total_e=0, 
-        total_enc=0,
-        otra_variable_que_te_marque_error=0
-    )
+    # Aquí definimos un "diccionario" de seguridad con todas las variables que tu HTML pudiera estar pidiendo
+    # Ponles 0 a todas para que la página cargue sí o sí.
+    variables = {
+        'total_e': 0,
+        'total_enc': 0,
+        'otra_variable': 0,
+        'nombre_usuario': 'Invitado'
+    }
+    return render_template('index.html', **variables)
 
 # ... (tus otras rutas aquí)
 
